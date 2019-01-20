@@ -15,14 +15,9 @@ import java.io.OutputStream;
  * @author leo
  * @date 2019/1/20
  */
-public class EpubFormatter implements FormatterInterface {
+public class TxtFormatter implements FormatterInterface {
 
-    final static Logger logger = LoggerFactory.getLogger(EpubFormatter.class);
-
-    /**
-     *
-     */
-    private nl.siegmann.epublib.domain.Book epubBook;
+    final static Logger logger = LoggerFactory.getLogger(TxtFormatter.class);
 
     private Book book;
 
@@ -32,12 +27,10 @@ public class EpubFormatter implements FormatterInterface {
     private boolean isLoad = false;
 
     public void load(FileInputStream stream) {
-        EpubReader reader = new EpubReader();
         try {
-            epubBook = reader.readEpub(stream);
             isLoad = true;
         } catch (Exception e) {
-            logger.error("epubFormatter加载文件失败：{}", ExceptionUtils.getStackTrace(e));
+            logger.error("txtFormatter加载文件失败：{}", ExceptionUtils.getStackTrace(e));
         }
     }
 
@@ -45,15 +38,13 @@ public class EpubFormatter implements FormatterInterface {
         try {
             this.book = book;
         } catch (Exception e) {
-            logger.error("epubFormatter加载文件失败：{}", ExceptionUtils.getStackTrace(e));
+            logger.error("txtFormatter加载文件失败：{}", ExceptionUtils.getStackTrace(e));
         }
     }
 
     public Book parse() {
         if (isLoad) {
             book = new Book();
-            book.setName(epubBook.getMetadata().getFirstTitle());
-            book.setContentTable(this.parseContentTable(epubBook));
             return book;
         } else {
             return null;
@@ -62,7 +53,6 @@ public class EpubFormatter implements FormatterInterface {
 
     public ContentTable parseContentTable(nl.siegmann.epublib.domain.Book book) {
         ContentTable table = new ContentTable();
-        TableOfContents contents = book.getTableOfContents();
         return table;
     }
 
