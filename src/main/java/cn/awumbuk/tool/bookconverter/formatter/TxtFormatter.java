@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.io.FileInputStream;
 import java.io.OutputStream;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * @author leo
@@ -22,6 +23,8 @@ public class TxtFormatter implements FormatterInterface {
     final static Logger logger = LoggerFactory.getLogger(TxtFormatter.class);
 
     private Book book;
+
+    private String chapterTitlePrefix = "### ";
 
     /**
      * 是否加载成功
@@ -70,6 +73,25 @@ public class TxtFormatter implements FormatterInterface {
 
     @Override
     public boolean export(OutputStream outputStream) {
+        if (book.getChapters() != null) {
+            for (Map.Entry<String, Chapter> entry : book.getChapters().entrySet()) {
+                String chapterContent = this.exportChapter(entry.getValue());
+                try {
+                    outputStream.write(chapterContent.getBytes());
+                } catch (Exception e) {
+                    logger.error("导出章节失败：{}", ExceptionUtils.getStackTrace(e));
+                }
+            }
+        }
         return false;
+    }
+
+    private String exportChapter(Chapter chapter) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(chapterTitlePrefix);
+        builder.append(chapter.getTitle()).append("\n\n");
+        builder.append(chapter.getContent());
+        builder.append("\n\n");
+        return builder.toString();
     }
 }

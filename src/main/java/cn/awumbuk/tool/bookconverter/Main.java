@@ -43,14 +43,15 @@ public class Main {
             BookConverter converter = BookConverter.getInstance();
             // 打开文件并读取流
             File file = FileUtils.getFile(fileName);
-            String outFileName = file.getName() + ".txt";
+            String outFileName = file.getPath() + ".txt";
+            File outFile = FileUtils.getFile(outFileName);
             FileInputStream inputStream = FileUtils.openInputStream(file);
             // 加载文件数据
             converter.setData(inputStream, BookConverter.EPUB);
-            converter.asTxt();
+            String content = converter.asTxt();
             // 写入文件
             logger.info("写入文件：{}", outFileName);
-//            outputStream.
+            FileUtils.write(outFile, content);
         } catch (IOException e) {
             logger.error("打开文件{}失败：", fileName, ExceptionUtils.getMessage(e));
         }

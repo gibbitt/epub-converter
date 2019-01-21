@@ -150,7 +150,7 @@ public class EpubFormatter implements FormatterInterface {
                 chapter.setTitle(title);
                 chapterMap.put(href, chapter);
                 logger.info("title: {}", chapter.getTitle());
-                logger.info("content: {}", StringUtils.trim(chapter.getContent()));
+//                logger.info("content: {}", StringUtils.trim(chapter.getContent()));
             }
         } catch (Exception e) {
             logger.error(e.getMessage());
