@@ -3,10 +3,7 @@ package cn.awumbuk.tool.bookconverter.formatter;
 import cn.awumbuk.tool.bookconverter.entity.Book;
 import cn.awumbuk.tool.bookconverter.entity.Chapter;
 import cn.awumbuk.tool.bookconverter.entity.ContentTable;
-import cn.awumbuk.tool.bookconverter.util.BookUtil;
-import nl.siegmann.epublib.domain.MediaType;
 import nl.siegmann.epublib.domain.Resource;
-import nl.siegmann.epublib.domain.TableOfContents;
 import nl.siegmann.epublib.epub.EpubReader;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -70,6 +67,7 @@ public class EpubFormatter implements FormatterInterface {
         if (isLoad) {
             book = new Book();
             book.setName(epubBook.getMetadata().getFirstTitle());
+            logger.info("========== parse epub: {}", book.getName());
             book.setContentTable(this.parseContentTable(epubBook));
             book.setChapters(this.parseChapter(epubBook));
             return book;
@@ -126,10 +124,13 @@ public class EpubFormatter implements FormatterInterface {
                 Chapter chapter = new Chapter();
                 String href = resource.getHref();
                 // 标题
-                String title = table.getTitleByHref(href);
-                if (StringUtils.isBlank(title)) {
-                    // 非内容章节
-                    continue;
+                String title = "";
+                if (!table.getTableOfContents().isEmpty()) {
+                    title = table.getTitleByHref(href);
+                    if (StringUtils.isBlank(title)) {
+                        // 非内容章节
+                        continue;
+                    }
                 }
                 // 内容
                 String content = new String(resource.getData(), "UTF-8");
@@ -150,7 +151,6 @@ public class EpubFormatter implements FormatterInterface {
                 chapter.setTitle(title);
                 chapterMap.put(href, chapter);
                 logger.info("title: {}", chapter.getTitle());
-//                logger.info("content: {}", StringUtils.trim(chapter.getContent()));
             }
         } catch (Exception e) {
             logger.error(e.getMessage());

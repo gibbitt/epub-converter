@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -50,7 +49,7 @@ public class BookConverter {
     public static BookConverter getInstance() {
         if (converter == null) {
             converter = new BookConverter();
-            converter.formatters = new HashMap<String, FormatterInterface>();
+            converter.formatters = new HashMap<>();
             converter.formatters.put(TXT, new TxtFormatter());
             converter.formatters.put(EPUB, new EpubFormatter());
         }

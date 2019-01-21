@@ -5,6 +5,7 @@ import cn.awumbuk.tool.bookconverter.entity.Chapter;
 import cn.awumbuk.tool.bookconverter.entity.ContentTable;
 import nl.siegmann.epublib.domain.TableOfContents;
 import nl.siegmann.epublib.epub.EpubReader;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +14,8 @@ import java.io.FileInputStream;
 import java.io.OutputStream;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author leo
@@ -24,7 +27,10 @@ public class TxtFormatter implements FormatterInterface {
 
     private Book book;
 
-    private String chapterTitlePrefix = "### ";
+    private final String chapterTitlePrefix = "### ";
+    private final String paragraphPrefix = "  ";
+
+    private Pattern pattern = Pattern.compile("^ *", Pattern.DOTALL);
 
     /**
      * 是否加载成功
@@ -87,10 +93,16 @@ public class TxtFormatter implements FormatterInterface {
     }
 
     private String exportChapter(Chapter chapter) {
+
         StringBuilder builder = new StringBuilder();
         builder.append(chapterTitlePrefix);
-        builder.append(chapter.getTitle()).append("\n\n");
-        builder.append(chapter.getContent());
+        if (StringUtils.isNotBlank(chapter.getTitle())) {
+            builder.append(chapter.getTitle());
+        }
+        builder.append("\n\n");
+        Matcher matcher = pattern.matcher(chapter.getContent());
+        String content = matcher.replaceAll(paragraphPrefix);
+        builder.append(content.replace("\n", "\n\n"));
         builder.append("\n\n");
         return builder.toString();
     }
