@@ -1,10 +1,12 @@
 package cn.awumbuk.tool.bookconverter.formatter;
 
 import cn.awumbuk.tool.bookconverter.entity.Book;
+import cn.awumbuk.tool.bookconverter.entity.Chapter;
 import cn.awumbuk.tool.bookconverter.entity.ContentTable;
 
 import java.io.FileInputStream;
 import java.io.OutputStream;
+import java.util.LinkedHashMap;
 
 /**
  * @author leo
@@ -34,6 +36,13 @@ public interface FormatterInterface {
      * @return
      */
     ContentTable parseContentTable(nl.siegmann.epublib.domain.Book book);
+
+    /**
+     * 解析章节内容
+     * @param book
+     * @return
+     */
+    LinkedHashMap<String, Chapter> parseChapter(nl.siegmann.epublib.domain.Book book);
 
     /**
      *

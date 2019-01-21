@@ -1,6 +1,7 @@
 package cn.awumbuk.tool.bookconverter.formatter;
 
 import cn.awumbuk.tool.bookconverter.entity.Book;
+import cn.awumbuk.tool.bookconverter.entity.Chapter;
 import cn.awumbuk.tool.bookconverter.entity.ContentTable;
 import nl.siegmann.epublib.domain.TableOfContents;
 import nl.siegmann.epublib.epub.EpubReader;
@@ -10,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.FileInputStream;
 import java.io.OutputStream;
+import java.util.LinkedHashMap;
 
 /**
  * @author leo
@@ -26,6 +28,7 @@ public class TxtFormatter implements FormatterInterface {
      */
     private boolean isLoad = false;
 
+    @Override
     public void load(FileInputStream stream) {
         try {
             isLoad = true;
@@ -34,6 +37,7 @@ public class TxtFormatter implements FormatterInterface {
         }
     }
 
+    @Override
     public void load(Book book) {
         try {
             this.book = book;
@@ -42,6 +46,7 @@ public class TxtFormatter implements FormatterInterface {
         }
     }
 
+    @Override
     public Book parse() {
         if (isLoad) {
             book = new Book();
@@ -51,11 +56,19 @@ public class TxtFormatter implements FormatterInterface {
         }
     }
 
+    @Override
     public ContentTable parseContentTable(nl.siegmann.epublib.domain.Book book) {
         ContentTable table = new ContentTable();
         return table;
     }
 
+    @Override
+    public LinkedHashMap<String, Chapter> parseChapter(nl.siegmann.epublib.domain.Book book) {
+        LinkedHashMap<String, Chapter> chapterMap = new LinkedHashMap<>();
+        return chapterMap;
+    }
+
+    @Override
     public boolean export(OutputStream outputStream) {
         return false;
     }

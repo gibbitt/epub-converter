@@ -7,8 +7,10 @@ import cn.awumbuk.tool.bookconverter.formatter.TxtFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -67,13 +69,20 @@ public class BookConverter {
      * 导出为txt文件
      * @return
      */
-    public boolean asTxt() {
+    public String asTxt() {
+        String fullBookContent = "";
         book = formatters.get(formatterName).parse();
         FormatterInterface txtFormatter = formatters.get(TXT);
         txtFormatter.load(book);
-        //txtFormatter.export();
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        txtFormatter.export(stream);
+        try {
+            fullBookContent = stream.toString("UTF-8");
+        } catch (Exception e) {
+            logger.error("转换编码出错：");
+        }
         logger.info("{}：{}", formatterName, book.getName());
-        return false;
+        return fullBookContent;
     }
 
     /**
