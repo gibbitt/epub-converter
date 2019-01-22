@@ -28,6 +28,7 @@ public class TxtFormatter implements FormatterInterface {
     private Book book;
 
     private final String chapterTitlePrefix = "### ";
+    private final String tableOfContentsPrefix = "  * ";
     private final String paragraphPrefix = "  ";
 
     private Pattern pattern = Pattern.compile("^ *", Pattern.DOTALL);
@@ -80,16 +81,32 @@ public class TxtFormatter implements FormatterInterface {
     @Override
     public boolean export(OutputStream outputStream) {
         if (book.getChapters() != null) {
-            for (Map.Entry<String, Chapter> entry : book.getChapters().entrySet()) {
-                String chapterContent = this.exportChapter(entry.getValue());
-                try {
-                    outputStream.write(chapterContent.getBytes());
-                } catch (Exception e) {
-                    logger.error("导出章节失败：{}", ExceptionUtils.getStackTrace(e));
+            try {
+                String bookName = "【" + book.getName() + "】" + "\n";
+                outputStream.write(bookName.getBytes());
+                String tableOfContents = this.exportTableOfContents(book.getContentTable());
+                outputStream.write(tableOfContents.getBytes());
+                for (Map.Entry<String, Chapter> entry : book.getChapters().entrySet()) {
+                    String chapterContent = this.exportChapter(entry.getValue());
+                        outputStream.write(chapterContent.getBytes());
                 }
+            } catch (Exception e) {
+                logger.error("导出章节失败：{}", ExceptionUtils.getStackTrace(e));
             }
         }
         return false;
+    }
+
+    private String exportTableOfContents(ContentTable table) {
+        StringBuilder builder = new StringBuilder();
+        if (!table.getTableOfContents().isEmpty()) {
+            builder.append("\n");
+            for (Map.Entry<String, String> entry: table.getTableOfContents().entrySet()) {
+                builder.append(tableOfContentsPrefix).append(entry.getValue()).append("\n");
+            }
+        }
+        builder.append("\n\n");
+        return builder.toString();
     }
 
     private String exportChapter(Chapter chapter) {
@@ -100,9 +117,12 @@ public class TxtFormatter implements FormatterInterface {
             builder.append(chapter.getTitle());
         }
         builder.append("\n\n");
-        Matcher matcher = pattern.matcher(chapter.getContent());
-        String content = matcher.replaceAll(paragraphPrefix);
-        builder.append(content.replace("\n", "\n\n"));
+//        Matcher matcher = pattern.matcher(chapter.getContent());
+//        String content = matcher.replaceAll(paragraphPrefix);
+//        builder.append(content.replace("\n", "\n\n"));
+        for (String paragraph: chapter.getParagraphs()) {
+            builder.append(paragraphPrefix).append(paragraph).append("\n\n");
+        }
         builder.append("\n\n");
         return builder.toString();
     }

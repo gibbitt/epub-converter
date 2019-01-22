@@ -135,19 +135,38 @@ public class EpubFormatter implements FormatterInterface {
                 // 内容
                 String content = new String(resource.getData(), "UTF-8");
 
+                List<String> contents = new ArrayList<>();
                 Document document = Jsoup.parse(content);
+                if (StringUtils.isNotBlank(document.title())) {
+                    title = document.title();
+                }
                 Elements elements = document.getElementsByTag("body");
                 Elements links = document.getElementsByTag("a");
 
                 if (links.size() > 0) {
-                    content = elements.text();
+                    for (Element link: links) {
+                        content = elements.text();
+                        contents.add(StringUtils.trim(link.text()));
+                    }
                 } else {
                     Element body = elements.get(0);
-                    Matcher matcher = pattern.matcher(body.html());
-                    content = matcher.replaceAll("");
+                    Elements subElements = body.children();
+                    if (subElements.size() == 1) {
+                        // 外部包了一层div
+                        subElements = subElements.get(0).children();
+                    }
+                    for (Element e: subElements) {
+                        String c = StringUtils.trim(e.text());
+                        if (StringUtils.isNotBlank(c)) {
+                            contents.add(c);
+                        }
+                    }
+//                    Matcher matcher = pattern.matcher(body.html());
+//                    content = matcher.replaceAll("");
                 }
 
                 chapter.setContent(StringUtils.trim(content));
+                chapter.setParagraphs(contents);
                 chapter.setTitle(title);
                 chapterMap.put(href, chapter);
                 logger.info("title: {}", chapter.getTitle());
